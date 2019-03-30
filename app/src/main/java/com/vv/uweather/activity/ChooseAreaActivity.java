@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.vv.uweather.R;
 import com.vv.uweather.db.UWeatherDB;
 import com.vv.uweather.model.City;
-import com.vv.uweather.model.Country;
+import com.vv.uweather.model.County;
 import com.vv.uweather.model.Province;
 import com.vv.uweather.util.HttpCallbackListener;
 import com.vv.uweather.util.HttpUtil;
@@ -29,7 +29,7 @@ public class ChooseAreaActivity extends Activity {
 
     public static final int LEVEL_PROVINCE = 0;
     public static final int LEVEL_CITY = 1;
-    public static final int LEVEL_COUNTRY = 2;
+    public static final int LEVEL_COUNTY = 2;
 
     private ProgressDialog progressDialog;
     private TextView titleText;
@@ -38,10 +38,9 @@ public class ChooseAreaActivity extends Activity {
     private UWeatherDB uWeatherDB;
     private List<String> dataList = new ArrayList<String>();
 
-
     private List<Province> provinceList;
     private List<City> cityList;
-    private List<Country> countryList;
+    private List<County> countyList;
     private Province selectedProvince;
     private City selectedCity;
     // 当前选中的级别
@@ -67,7 +66,7 @@ public class ChooseAreaActivity extends Activity {
                     queryCities();
                 } else if (currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
-                    queryCountries();
+                    queryCounties();
                 }
             }
         });
@@ -106,7 +105,7 @@ public class ChooseAreaActivity extends Activity {
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            titleText.setText(selectedProvince.getProvinceName());
+            titleText.setText(selectedProvince.getProvinceName()+" ["+dataList.size()+"]");
             currentLevel = LEVEL_CITY;
         } else {
             queryFromServer(selectedProvince.getProvinceCode(), "city");
@@ -116,19 +115,19 @@ public class ChooseAreaActivity extends Activity {
     /**
      * 查询选中市内所有的县，优先从数据库查询，如果没有查询到再去服务器上查询
      */
-    private void queryCountries() {
-        countryList = uWeatherDB.loadCounties(selectedCity.getId());
-        if (countryList.size() > 0) {
+    private void queryCounties() {
+        countyList = uWeatherDB.loadCounties(selectedCity.getId());
+        if (countyList.size() > 0) {
             dataList.clear();
-            for (Country country : countryList) {
-                dataList.add(country.getCountryName());
+            for (County county : countyList) {
+                dataList.add(county.getCountyName());
             }
             adapter.notifyDataSetChanged();
             listView.setSelection(0);
-            titleText.setText(selectedCity.getCityName());
-            currentLevel = LEVEL_COUNTRY;
+            titleText.setText(selectedCity.getCityName()+" ["+dataList.size()+"]");
+            currentLevel = LEVEL_COUNTY;
         } else {
-            queryFromServer(selectedCity.getCityCode(), "country");
+            queryFromServer(selectedCity.getCityCode(), "county");
         }
     }
 
@@ -153,7 +152,7 @@ public class ChooseAreaActivity extends Activity {
                     result = Utility.handleProvincesResponse(uWeatherDB, response);
                 } else if ("city".equals(type)) {
                     result = Utility.handleCitiesResponse(uWeatherDB, response, selectedProvince.getId());
-                } else if ("country".equals(type)) {
+                } else if ("county".equals(type)) {
                     result = Utility.handleCountiesResponse(uWeatherDB, response, selectedCity.getId());
                 }
                 if (result) {
@@ -171,8 +170,8 @@ public class ChooseAreaActivity extends Activity {
                                 queryProvinces();
                             } else if ("city".equals(type)) {
                                 queryCities();
-                            } else if ("country".equals(type)) {
-                                queryCountries();
+                            } else if ("county".equals(type)) {
+                                queryCounties();
                             }
                         }
                     });
@@ -219,7 +218,7 @@ public class ChooseAreaActivity extends Activity {
      */
     @Override
     public void onBackPressed() {
-        if(currentLevel == LEVEL_COUNTRY) {
+        if(currentLevel == LEVEL_COUNTY) {
             queryCities();
         } else if (currentLevel == LEVEL_CITY) {
             queryProvinces();

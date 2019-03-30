@@ -1,5 +1,7 @@
 用于存放所有数据库相关的代码
 
+准备建立三张表，Province、City、County，
+分别用于存放省、市、县的各种数据信息，三张表的建表语句分别如下
 Province:
 create table Province(
     id integer primary key autoincrement,
@@ -7,6 +9,8 @@ create table Province(
     province_code text
 )
 
+id 是自增长主键，
+city_name 表示城市名，city_code 表示市级代号，province_id 是 City 表关联 Province 表的外键
 City:
 create tabele City(
     id integer primary key autoincrement,
@@ -15,11 +19,13 @@ create tabele City(
     province_id integer
 )
 
-Country:
-create table Country(
+id 是自增长主键，
+county_name 表示县名，county_code 表示县级代号，city_id 是 County 表关联 City 表的外键
+County:
+create table County(
     id integer primary key autoincrement,
-    country_name text,
-    country_code text,
+    county_name text,
+    county_code text,
     city_id integer
 )
 

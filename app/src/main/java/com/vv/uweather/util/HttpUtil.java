@@ -6,6 +6,11 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * 全国所有省市县的数据都是从服务器端获取到的，
+ * 因此这里和服务器的交互是必不可少的，可以在 util 包下先增加一个 HttpUtil 类
+ * HttpUtil 类中使用到了 HttpCallbackListener 接口来回调服务返回的结果
+ */
 public class HttpUtil {
 
     public static void sendHttpRequest(final String address, final HttpCallbackListener listener) {
