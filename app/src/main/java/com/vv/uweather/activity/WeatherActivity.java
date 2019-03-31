@@ -164,5 +164,16 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         startService(intent);
     }
 
+    /**
+     * TODO List
+     * 比如说以下功能是你可以考虑加入到酷欧天气中的。
+     * 1. 增加设置选项，让用户选择是否允许后台自动更新天气，以及设定更新的频率。
+     * 2. 优化软件界面，提供多套与天气对应的图片，让程序可以根据不同的天气自动切换背景图。
+     * 3. 允许选择多个城市，可以同时观察多个城市的天气信息，不用来回切换。
+     * 4. 提供更加完整的天气信息，包括未来几天的天气情况、风力指数、生活建议等。
+     * 4->data:view-source:http://www.weather.com.cn/data/zs/101180904.html
+     *
+     */
+
 
 }
