@@ -2,7 +2,10 @@ package com.vv.uweather.activity;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.View;
@@ -46,15 +49,29 @@ public class ChooseAreaActivity extends Activity {
     // 当前选中的级别
     private int currentLevel;
 
+    // 是否从 WeatherActivity 中跳转过来
+    private boolean isFromWeatherActivity;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        isFromWeatherActivity = getIntent().getBooleanExtra("from_weather_activity",false);
+
+        // 在 onCreate()方法的一开始先从 SharedPreferences 文件中读取 city_selected 标志位，
+        // 如果为 true 就说明当前已经选择过城市了，直接跳转到 WeatherActivity 即可。
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        // 已经选择了城市，且不是从 WeatherActivity 跳转过来，才会直接跳转到 WeatherActivity
+        if (prefs.getBoolean("city_selected", false) && !isFromWeatherActivity) {
+            Intent intent = new Intent(this, WeatherActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.choose_area);
-
-        listView = (ListView)findViewById(R.id.list_view);
-        titleText = (TextView)findViewById(R.id.title_text);
+        listView = findViewById(R.id.list_view);
+        titleText = findViewById(R.id.title_text);
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, dataList);
         listView.setAdapter(adapter);
         uWeatherDB = UWeatherDB.getInstance(this);
@@ -64,9 +81,18 @@ public class ChooseAreaActivity extends Activity {
                 if (currentLevel == LEVEL_PROVINCE) {
                     selectedProvince = provinceList.get(position);
                     queryCities();
-                } else if (currentLevel == LEVEL_CITY) {
+                } else if(currentLevel == LEVEL_CITY) {
                     selectedCity = cityList.get(position);
                     queryCounties();
+                    // 在 onItemClick()方法中加入一个 if 判断，
+                    // 如果当前级别是 LEVEL_COUNTY，就启动 WeatherActivity，
+                    // 并把当前选中县的县级代号传递过去
+                } else if (currentLevel == LEVEL_COUNTY) {
+                    String countyCode = countyList.get(position).getCountyCode();
+                    Intent intent = new Intent(ChooseAreaActivity.this, WeatherActivity.class);
+                    intent.putExtra("county_code", countyCode);
+                    startActivity(intent);
+                    finish();
                 }
             }
         });
@@ -223,6 +249,11 @@ public class ChooseAreaActivity extends Activity {
         } else if (currentLevel == LEVEL_CITY) {
             queryProvinces();
         } else {
+            // 如果是从 WeatherActivity 跳转过来的，则应该重新回到 WeatherActivity
+            if (isFromWeatherActivity){
+                Intent intent = new Intent(this, WeatherActivity.class);
+                startActivity(intent);
+            }
             finish();
         }
     }
