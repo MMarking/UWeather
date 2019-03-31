@@ -14,6 +14,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.vv.uweather.R;
+import com.vv.uweather.service.AutoUpdateService;
 import com.vv.uweather.util.HttpCallbackListener;
 import com.vv.uweather.util.HttpUtil;
 import com.vv.uweather.util.Utility;
@@ -157,6 +158,10 @@ public class WeatherActivity extends Activity implements View.OnClickListener {
         currentDateText.setText(prefs.getString("current_date", ""));
         weatherInfoLayout.setVisibility(View.VISIBLE);
         cityNameText.setVisibility(View.VISIBLE);
+
+        // 激活更新天气的服务
+        Intent intent = new Intent(this, AutoUpdateService.class);
+        startService(intent);
     }
 
 
